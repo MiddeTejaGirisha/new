@@ -25,6 +25,26 @@ Resources:
         Variables:
           PARAM1: VALUE
       Events:
+        GetStudentById:
+          Type: Api
+          Properties:
+            Path: /students/{id}  # Path with {id} for fetching student by ID
+            Method: get
+        GetAllStudents:
+          Type: Api
+          Properties:
+            Path: /students       # Path to fetch all students
+            Method: get
+        AddStudent:
+          Type: Api
+          Properties:
+            Path: /students       # Path to add a new student
+            Method: post
+        DeleteStudent:
+          Type: Api
+          Properties:
+            Path: /students/{id}  # Path to delete a student by ID
+            Method: delete
 #        HelloWorld:
 #          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
 #          Properties:

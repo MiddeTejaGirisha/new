@@ -18,20 +18,28 @@ public class DynamoDBCli {
     }
 
     public static void createStudentTable(DynamoDbClient dynamoDbClient) {
-        CreateTableRequest request = CreateTableRequest.builder()
-                .tableName("Student")
-                .keySchema(KeySchemaElement.builder().attributeName("id").keyType(
-                        KeyType.HASH).build())
-                .attributeDefinitions(
-                        AttributeDefinition.builder().attributeName("id").attributeType(
-                                ScalarAttributeType.S).build())
-                .provisionedThroughput(ProvisionedThroughput.builder()
-                                               .readCapacityUnits(5L)
-                                               .writeCapacityUnits(5L)
-                                               .build())
-                .build();
+        try {
+            // Check if the table exists
+            dynamoDbClient.describeTable(b -> b.tableName("Student"));
 
-        dynamoDbClient.createTable(request);
+            System.out.println("Table already exists.");
+        } catch (Exception e) {
+            // If table doesn't exist, create it
+            CreateTableRequest request = CreateTableRequest.builder()
+                    .tableName("Student")
+                    .keySchema(KeySchemaElement.builder().attributeName("id").keyType(KeyType.HASH).build())
+                    .attributeDefinitions(
+                            AttributeDefinition.builder().attributeName("id").attributeType(ScalarAttributeType.S).build())
+                    .provisionedThroughput(ProvisionedThroughput.builder()
+                                                   .readCapacityUnits(5L)
+                                                   .writeCapacityUnits(5L)
+                                                   .build())
+                    .build();
+
+            dynamoDbClient.createTable(request);
+            System.out.println("Table created.");
+        }
     }
+
 
 }

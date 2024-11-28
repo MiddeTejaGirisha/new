@@ -10,6 +10,8 @@ public class Student {
     private int age;
     private String grade;
 
+    public Student() {}
+
     @DynamoDbPartitionKey
     public String getId() {
         return id;

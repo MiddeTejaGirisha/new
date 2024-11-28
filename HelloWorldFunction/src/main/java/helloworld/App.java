@@ -1,17 +1,11 @@
 package helloworld;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.google.gson.Gson;
 import helloworld.pojo.Student;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -19,8 +13,9 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 /**
  * Handler for requests to Lambda function.
  */
-public class App implements RequestHandler<Map<String, Object>, String> {
+public class App implements RequestHandler<Map<String, Object>, Map<String, Object>> {
     private final StudentRepo studentRepository;
+    private static final Gson gson = new Gson();
 
     public App() {
         DynamoDbClient client = DynamoDBCli.createDynamoDbClient();
@@ -31,31 +26,74 @@ public class App implements RequestHandler<Map<String, Object>, String> {
     }
 
     @Override
-    public String handleRequest(Map<String, Object> input, Context context) {
-        String action = (String) input.get("action");
-        if ("create".equalsIgnoreCase(action)) {
-            Student student = parseStudent(input);
-            studentRepository.saveStudent(student);
-            return "Student saved successfully.";
-        } else if ("read".equalsIgnoreCase(action)) {
-            String id = (String) input.get("id");
-            return studentRepository.getStudentById(id).toString();
-        } else if ("delete".equalsIgnoreCase(action)) {
-            String id = (String) input.get("id");
-            studentRepository.deleteStudentById(id);
-            return "Student deleted successfully.";
-        } else if ("list".equalsIgnoreCase(action)) {
-            return studentRepository.getAllStudents().toString();
+    public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
+        try {
+            String httpMethod = (String) input.get("httpMethod");
+            String path = (String) input.get("path");
+            Map<String, String> pathParameters = safeCastToMap(input.get("pathParameters"));
+            String body = (String) input.get("body");
+
+            context.getLogger().log("HTTP Method: " + httpMethod + ", Path: " + path);
+
+            switch (httpMethod) {
+                case "POST":
+                    return handlePost(body);
+
+                case "GET":
+                    return handleGet(pathParameters);
+
+                case "DELETE":
+                    return handleDelete(pathParameters);
+
+                default:
+                    return generateResponse(400, "Unsupported HTTP method: " + httpMethod);
+            }
+        } catch (Exception e) {
+            context.getLogger().log("Error: " + e.getMessage());
+            return generateResponse(500, "Internal Server Error: " + e.getMessage());
         }
-        return "Invalid action.";
     }
 
-    private Student parseStudent(Map<String, Object> input) {
-        Student student = new Student();
-        student.setId((String) input.get("id"));
-        student.setName((String) input.get("name"));
-        student.setAge((Integer) input.get("age"));
-        student.setGrade((String) input.get("grade"));
-        return student;
+    private Map<String, Object> handlePost(String body) {
+        Student student = gson.fromJson(body, Student.class);
+        studentRepository.saveStudent(student);
+        return generateResponse(201, "Student created successfully with ID: " + student.getId());
+    }
+
+    private Map<String, Object> handleGet(Map<String, String> pathParameters) {
+        if (pathParameters != null && pathParameters.containsKey("id")) {
+            String id = pathParameters.get("id");
+            Student fetchedStudent = studentRepository.getStudentById(id);
+            return generateResponse(200, fetchedStudent);
+        } else {
+            List<Student> students = studentRepository.getAllStudents();
+            return generateResponse(200, students);
+        }
+    }
+
+    private Map<String, Object> handleDelete(Map<String, String> pathParameters) {
+        if (pathParameters != null && pathParameters.containsKey("id")) {
+            String id = pathParameters.get("id");
+            studentRepository.deleteStudentById(id);
+            return generateResponse(200, "Student with ID " + id + " deleted successfully.");
+        } else {
+            return generateResponse(400, "ID not provided for DELETE operation");
+        }
+    }
+
+    private Map<String, Object> generateResponse(int statusCode, Object body) {
+        return Map.of(
+                "statusCode", statusCode,
+                "headers", Map.of("Content-Type", "application/json"),
+                "body", gson.toJson(body)
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> safeCastToMap(Object input) {
+        if (input instanceof Map) {
+            return (Map<String, String>) input;
+        }
+        return null;
     }
 }
