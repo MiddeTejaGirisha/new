@@ -21,18 +21,18 @@ Resources:
       MemorySize: 512
       Environment:
         Variables:
-          PARAM1: VALUE
+          TABLE_NAME: Student
       Events:
         GetStudentById:
           Type: Api
           Properties:
             Path: /students/{id}
             Method: get
-        GetAllStudents:
+        UpdateStudentById:
           Type: Api
           Properties:
-            Path: /students
-            Method: get
+            Path: /students/{id}
+            Method: put
         AddStudent:
           Type: Api
           Properties:

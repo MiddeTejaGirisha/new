@@ -5,95 +5,131 @@ import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import helloworld.pojo.Student;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+//import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 /**
  * Handler for requests to Lambda function.
  */
-public class App implements RequestHandler<Map<String, Object>, Map<String, Object>> {
-    private final StudentRepo studentRepository;
-    private static final Gson gson = new Gson();
+public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    private final DynamoDbClient dynamoDbClient;
+    private final StudentRepo studentRepo;
 
     public App() {
-        DynamoDbClient client = DynamoDBCli.createDynamoDbClient();
-        DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(client)
-                .build();
-        studentRepository = new StudentRepo(enhancedClient);
+        this.dynamoDbClient = DynamoDBCli.createDynamoDbClient(); // DynamoDB client initialization
+        this.studentRepo = new StudentRepo(dynamoDbClient); // StudentRepo to handle CRUD
     }
 
     @Override
-    public Map<String, Object> handleRequest(Map<String, Object> input, Context context) {
+    public APIGatewayProxyResponseEvent handleRequest(
+            APIGatewayProxyRequestEvent event, Context context) {
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+
+        String path = event.getPath();
+        String httpMethod = event.getHttpMethod();
+
         try {
-            String httpMethod = (String) input.get("httpMethod");
-            String path = (String) input.get("path");
-            Map<String, String> pathParameters = safeCastToMap(input.get("pathParameters"));
-            String body = (String) input.get("body");
-
-            context.getLogger().log("HTTP Method: " + httpMethod + ", Path: " + path);
-
+            // Determine the operation based on the HTTP method and URL path
             switch (httpMethod) {
                 case "POST":
-                    return handlePost(body);
-
+                    return createStudent(event);
                 case "GET":
-                    return handleGet(pathParameters);
-
+                    return getStudent(event);
+                case "PUT":
+                    return updateStudent(event);
                 case "DELETE":
-                    return handleDelete(pathParameters);
-
+                    return deleteStudent(event);
                 default:
-                    return generateResponse(400, "Unsupported HTTP method: " + httpMethod);
+                    response.setStatusCode(405); // Method Not Allowed
+                    response.setBody("Method not allowed");
+                    return response;
             }
         } catch (Exception e) {
-            context.getLogger().log("Error: " + e.getMessage());
-            return generateResponse(500, "Internal Server Error: " + e.getMessage());
+            response.setStatusCode(500); // Internal Server Error
+            response.setBody("Error: " + e.getMessage());
+            return response;
         }
     }
 
-    private Map<String, Object> handlePost(String body) {
-        Student student = gson.fromJson(body, Student.class);
-        studentRepository.saveStudent(student);
-        return generateResponse(201, "Student created successfully with ID: " + student.getId());
+    // Handle POST to create a student
+    private APIGatewayProxyResponseEvent createStudent(APIGatewayProxyRequestEvent event) {
+        // Extract student information from the body of the event
+        String body = event.getBody();
+        Student student = parseStudentFromBody(body); // A helper method to parse JSON into Student object
+
+        studentRepo.saveStudent(student); // Save student to DynamoDB
+
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setStatusCode(201); // Created
+        response.setBody("Student created successfully");
+        return response;
     }
 
-    private Map<String, Object> handleGet(Map<String, String> pathParameters) {
-        if (pathParameters != null && pathParameters.containsKey("id")) {
-            String id = pathParameters.get("id");
-            Student fetchedStudent = studentRepository.getStudentById(id);
-            return generateResponse(200, fetchedStudent);
+    // Handle GET to retrieve a student by ID
+    private APIGatewayProxyResponseEvent getStudent(APIGatewayProxyRequestEvent event) {
+        String studentId = event.getPathParameters().get("id");
+
+        Student student = studentRepo.getStudentById(studentId);
+
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        if (student != null) {
+            response.setStatusCode(200); // OK
+            response.setBody(toJson(student)); // Convert the student object to JSON
         } else {
-            List<Student> students = studentRepository.getAllStudents();
-            return generateResponse(200, students);
+            response.setStatusCode(404); // Not Found
+            response.setBody("Student not found");
+        }
+
+        return response;
+    }
+
+    // Handle PUT to update a student
+    private APIGatewayProxyResponseEvent updateStudent(APIGatewayProxyRequestEvent event) {
+        String body = event.getBody();
+        Student student = parseStudentFromBody(body);
+
+        studentRepo.updateStudent(student);
+
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setStatusCode(200); // OK
+        response.setBody("Student updated successfully");
+        return response;
+    }
+
+    // Handle DELETE to delete a student by ID
+    private APIGatewayProxyResponseEvent deleteStudent(APIGatewayProxyRequestEvent event) {
+        String studentId = event.getPathParameters().get("id");
+
+        studentRepo.deleteStudentById(studentId);
+
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setStatusCode(200); // OK
+        response.setBody("Student deleted successfully");
+        return response;
+    }
+
+    // Helper method to parse JSON into Student object (use your preferred library, e.g., Jackson)
+    private Student parseStudentFromBody(String body) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Parse the JSON string to the Student object
+            return objectMapper.readValue(body, Student.class);
+        } catch (Exception e) {
+            // Handle the exception if JSON parsing fails
+            e.printStackTrace();
+            return null; // You could throw an exception or return a default object if needed
         }
     }
 
-    private Map<String, Object> handleDelete(Map<String, String> pathParameters) {
-        if (pathParameters != null && pathParameters.containsKey("id")) {
-            String id = pathParameters.get("id");
-            studentRepository.deleteStudentById(id);
-            return generateResponse(200, "Student with ID " + id + " deleted successfully.");
-        } else {
-            return generateResponse(400, "ID not provided for DELETE operation");
-        }
-    }
-
-    private Map<String, Object> generateResponse(int statusCode, Object body) {
-        return Map.of(
-                "statusCode", statusCode,
-                "headers", Map.of("Content-Type", "application/json"),
-                "body", gson.toJson(body)
-        );
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, String> safeCastToMap(Object input) {
-        if (input instanceof Map) {
-            return (Map<String, String>) input;
-        }
-        return null;
+    // Helper method to convert a Student object to JSON (use Jackson, Gson, etc.)
+    private String toJson(Student student) {
+        // Convert Student object to JSON
+        return "{\"id\":\"" + student.getId() + "\", \"name\":\"" + student.getName() + "\", \"age\": " + student.getAge() + ", \"grade\":\"" + student.getGrade() + "\"}";
     }
 }

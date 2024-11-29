@@ -1,18 +1,15 @@
 package helloworld.pojo;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+//import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+//import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
-@DynamoDbBean
 public class Student {
     private String id;
     private String name;
     private int age;
     private String grade;
 
-    public Student() {}
-
-    @DynamoDbPartitionKey
+    // Getters and setters
     public String getId() {
         return id;
     }
@@ -45,3 +42,4 @@ public class Student {
         this.grade = grade;
     }
 }
+

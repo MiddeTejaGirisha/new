@@ -21,25 +21,35 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Environment:
         Variables:
-          PARAM1: VALUE
+          TABLE_NAME: Student  # Ensure this matches the manually created table
+#        Policies:
+#          - DynamoDBCrudPolicy:
+#              TableName: Student
       Events:
+        # Event to fetch student by ID
         GetStudentById:
           Type: Api
           Properties:
             Path: /students/{id}  # Path with {id} for fetching student by ID
             Method: get
-        GetAllStudents:
+
+        # Event to fetch all students
+        UpdateStudentById:
           Type: Api
           Properties:
-            Path: /students       # Path to fetch all students
-            Method: get
+            Path: /students/{id}  # Path to fetch all students
+            Method: put
+
+        # Event to add a new student
         AddStudent:
           Type: Api
           Properties:
-            Path: /students       # Path to add a new student
+            Path: /students  # Path to add a new student
             Method: post
+
+        # Event to delete a student by ID
         DeleteStudent:
           Type: Api
           Properties:
