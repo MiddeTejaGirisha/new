@@ -4,8 +4,8 @@
 codeuri = "C:\\Users\\ADMIN\\Downloads\\SamDyDB\\DynamoDBPrac\\HelloWorldFunction"
 runtime = "java21"
 architecture = "x86_64"
-handler = "helloworld.App::handleRequest"
-source_hash = "cf9c7b0b3d5b08e23c7be8efb788f9827f6b5798b0cf5d8bac2d216dd798e7cc"
+handler = "crudoperations.LambdaHandler::handleRequest"
+source_hash = "8f440aad3238ee35d678044d1d3b06ba7790a38351e405a2d26c6935fbd230d2"
 manifest_hash = ""
 packagetype = "Zip"
 functions = ["HelloWorldFunction"]

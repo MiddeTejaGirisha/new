@@ -1,22 +1,20 @@
-package helloworld;
+package crudoperations.dao;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
-import helloworld.pojo.Student;
+import crudoperations.pojo.Student;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class  StudentRepo {
+public class StudentDAO {
     private final DynamoDbClient dynamoDbClient;
     private final String tableName = "Student";
 
-    public StudentRepo(DynamoDbClient dynamoDbClient) {
+    public StudentDAO(DynamoDbClient dynamoDbClient) {
         this.dynamoDbClient = dynamoDbClient;
     }
 
@@ -52,7 +50,7 @@ public class  StudentRepo {
         Student student = new Student();
         student.setId(item.get("id").s());
         student.setName(item.get("name").s());
-        student.setAge(Integer.parseInt(item.get("age").n()));
+        student.setAge((int) Long.parseLong(item.get("age").n()));
         student.setGrade(item.get("grade").s());
         return student;
     }

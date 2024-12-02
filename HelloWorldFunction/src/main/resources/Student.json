@@ -1,0 +1,111 @@
+{
+  "ModelName": "Student",
+  "ModelMetadata": {
+    "Author": "M",
+    "DateCreated": "Nov 28, 2024, 05:44 PM",
+    "DateLastModified": "Dec 02, 2024, 02:13 PM",
+    "Description": "table student",
+    "AWSService": "Amazon DynamoDB",
+    "Version": "3.0"
+  },
+  "DataModel": [
+    {
+      "TableName": "Student",
+      "KeyAttributes": {
+        "PartitionKey": {
+          "AttributeName": "id",
+          "AttributeType": "S"
+        }
+      },
+      "NonKeyAttributes": [
+        {
+          "AttributeName": "name",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "age",
+          "AttributeType": "N"
+        },
+        {
+          "AttributeName": "grade",
+          "AttributeType": "S"
+        }
+      ],
+      "TableData": [
+        {
+          "id": {
+            "S": "S-0001"
+          },
+          "name": {
+            "S": "Ram"
+          },
+          "age": {
+            "N": "21"
+          },
+          "grade": {
+            "S": "A"
+          }
+        },
+        {
+          "id": {
+            "S": "S-0002"
+          },
+          "name": {
+            "S": "Sam"
+          },
+          "age": {
+            "N": "22"
+          },
+          "grade": {
+            "S": "B"
+          }
+        },
+        {
+          "id": {
+            "S": "S-0003"
+          },
+          "name": {
+            "S": "Eva"
+          },
+          "age": {
+            "N": "21"
+          },
+          "grade": {
+            "S": "A"
+          }
+        }
+      ],
+      "DataAccess": {
+        "MySql": {}
+      },
+      "SampleDataFormats": {},
+      "BillingMode": "PROVISIONED",
+      "ProvisionedCapacitySettings": {
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        },
+        "AutoScalingRead": {
+          "ScalableTargetRequest": {
+            "MinCapacity": 1,
+            "MaxCapacity": 10,
+            "ServiceRole": "AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+          },
+          "ScalingPolicyConfiguration": {
+            "TargetValue": 70
+          }
+        },
+        "AutoScalingWrite": {
+          "ScalableTargetRequest": {
+            "MinCapacity": 1,
+            "MaxCapacity": 10,
+            "ServiceRole": "AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+          },
+          "ScalingPolicyConfiguration": {
+            "TargetValue": 70
+          }
+        }
+      }
+    }
+  ]
+}

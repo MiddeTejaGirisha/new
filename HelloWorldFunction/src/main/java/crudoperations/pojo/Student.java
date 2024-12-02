@@ -1,7 +1,4 @@
-package helloworld.pojo;
-
-//import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-//import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+package crudoperations.pojo;
 
 public class Student {
     private String id;

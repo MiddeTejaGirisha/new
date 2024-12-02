@@ -1,29 +1,26 @@
-package helloworld;
-
-import java.util.List;
-import java.util.Map;
+package crudoperations;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import helloworld.pojo.Student;
-//import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import crudoperations.dao.StudentDAO;
+import crudoperations.utility.DynamoDBCli;
+import crudoperations.pojo.Student;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 /**
  * Handler for requests to Lambda function.
  */
-public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private final DynamoDbClient dynamoDbClient;
-    private final StudentRepo studentRepo;
+    private final StudentDAO studentRepo;
 
-    public App() {
+    public LambdaHandler() {
         this.dynamoDbClient = DynamoDBCli.createDynamoDbClient(); // DynamoDB client initialization
-        this.studentRepo = new StudentRepo(dynamoDbClient); // StudentRepo to handle CRUD
+        this.studentRepo = new StudentDAO(dynamoDbClient); // StudentRepo to handle CRUD
     }
 
     @Override
@@ -31,7 +28,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             APIGatewayProxyRequestEvent event, Context context) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
 
-        String path = event.getPath();
         String httpMethod = event.getHttpMethod();
 
         try {
@@ -92,7 +88,16 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     // Handle PUT to update a student
     private APIGatewayProxyResponseEvent updateStudent(APIGatewayProxyRequestEvent event) {
         String body = event.getBody();
+        String studentId=event.getPathParameters().get("id");
         Student student = parseStudentFromBody(body);
+
+        if (!studentId.equals(student.getId())) {
+            // Return error response if IDs do not match
+            APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+            response.setStatusCode(400); // Bad Request
+            response.setBody("Error: URL id does not match the student id in the body");
+            return response;
+        }
 
         studentRepo.updateStudent(student);
 
@@ -114,22 +119,27 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         return response;
     }
 
-    // Helper method to parse JSON into Student object (use your preferred library, e.g., Jackson)
+    // Helper method to parse JSON into Student object
     private Student parseStudentFromBody(String body) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        Gson gson = new Gson();
         try {
-            // Parse the JSON string to the Student object
-            return objectMapper.readValue(body, Student.class);
+            // Parse JSON string to Student object
+            return gson.fromJson(body, Student.class);
         } catch (Exception e) {
-            // Handle the exception if JSON parsing fails
             e.printStackTrace();
-            return null; // You could throw an exception or return a default object if needed
+            return null;
         }
     }
 
-    // Helper method to convert a Student object to JSON (use Jackson, Gson, etc.)
+    // Helper method to convert a Student object to JSON
     private String toJson(Student student) {
-        // Convert Student object to JSON
-        return "{\"id\":\"" + student.getId() + "\", \"name\":\"" + student.getName() + "\", \"age\": " + student.getAge() + ", \"grade\":\"" + student.getGrade() + "\"}";
+        Gson gson = new Gson();
+        try {
+            // Convert Student object to JSON
+            return gson.toJson(student);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }
