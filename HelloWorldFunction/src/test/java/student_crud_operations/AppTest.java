@@ -1,4 +1,4 @@
-package helloworld;
+package student_crud_operations;
 //
 //import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 //import static org.junit.Assert.assertEquals;

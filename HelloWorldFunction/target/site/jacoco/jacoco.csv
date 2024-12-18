@@ -1,0 +1,5 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+A sample Hello World created for SAM CLI.,student_crud_operations.pojo,Student,0,164,0,0,0,70,0,47,0,47
+A sample Hello World created for SAM CLI.,student_crud_operations.utilities,DynamoDBCli,28,0,0,0,10,0,2,0,2,0
+A sample Hello World created for SAM CLI.,student_crud_operations.dao,StudentDao,14,897,0,2,5,182,0,6,0,5
+A sample Hello World created for SAM CLI.,student_crud_operations,LambdaHandler,243,0,11,0,66,0,15,0,8,0

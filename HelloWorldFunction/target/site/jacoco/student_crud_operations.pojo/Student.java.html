@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Student.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A sample Hello World created for SAM CLI.</a> &gt; <a href="index.source.html" class="el_package">student_crud_operations.pojo</a> &gt; <span class="el_source">Student.java</span></div><h1>Student.java</h1><pre class="source lang-java linenums">package student_crud_operations.pojo;
+
+<span class="fc" id="L3">public class Student {</span>
+    private String S_NO;
+    private String CollegeID;
+    private String AdmissionID;
+    private String CAMPUS;
+
+    private String Pursuing_branch;
+    private String Pursuing_campus;
+    private String AADHAR_NO;
+    private String DOB;
+    private String STUDENT_NAME_AS_PER_SSC;
+    private String FATHER_NAME_AS_PER_SSC;
+    private String MOTHER_NAME_AS_PER_SSC;
+    private String OCCUPATION;
+    private String F_OR_M;
+
+    private String Roll_Number;
+
+    private String Section;
+    private  String profile_picture;
+
+    private String Student_Class;
+    private String CAST;
+    private String SUB_CAST;
+
+    private String MOBILE_NO_1;
+    private String MOBILE_NO_2;
+
+    private String DIST_NAME;
+
+    private String PIN_CODE;
+
+    // Getters and setters
+
+    public String getS_NO() {
+<span class="fc" id="L38">        return S_NO;</span>
+    }
+
+    public void setS_NO(String s_NO) {
+<span class="fc" id="L42">        S_NO = s_NO;</span>
+<span class="fc" id="L43">    }</span>
+
+    public String getCollegeID() {
+<span class="fc" id="L46">        return CollegeID;</span>
+    }
+
+    public void setCollegeID(String collegeID) {
+<span class="fc" id="L50">        CollegeID = collegeID;</span>
+<span class="fc" id="L51">    }</span>
+
+    public String getAdmissionID() {
+<span class="fc" id="L54">        return AdmissionID;</span>
+    }
+
+    public void setAdmissionID(String admissionID) {
+<span class="fc" id="L58">        AdmissionID = admissionID;</span>
+<span class="fc" id="L59">    }</span>
+
+    public String getCAMPUS() {
+<span class="fc" id="L62">        return CAMPUS;</span>
+    }
+
+    public void setCAMPUS(String CAMPUS) {
+<span class="fc" id="L66">        this.CAMPUS = CAMPUS;</span>
+<span class="fc" id="L67">    }</span>
+
+    public String getPursuing_branch() {
+<span class="fc" id="L70">        return Pursuing_branch;</span>
+    }
+
+    public void setPursuing_branch(String pursuing_branch) {
+<span class="fc" id="L74">        Pursuing_branch = pursuing_branch;</span>
+<span class="fc" id="L75">    }</span>
+
+    public String getPursuing_campus() {
+<span class="fc" id="L78">        return Pursuing_campus;</span>
+    }
+
+    public void setPursuing_campus(String pursuing_campus) {
+<span class="fc" id="L82">        Pursuing_campus = pursuing_campus;</span>
+<span class="fc" id="L83">    }</span>
+
+    public String getAADHAR_NO() {
+<span class="fc" id="L86">        return AADHAR_NO;</span>
+    }
+
+    public void setAADHAR_NO(String AADHAR_NO) {
+<span class="fc" id="L90">        this.AADHAR_NO = AADHAR_NO;</span>
+<span class="fc" id="L91">    }</span>
+
+    public String getDOB() {
+<span class="fc" id="L94">        return DOB;</span>
+    }
+
+    public void setDOB(String DOB) {
+<span class="fc" id="L98">        this.DOB = DOB;</span>
+<span class="fc" id="L99">    }</span>
+
+    public String getSTUDENT_NAME_AS_PER_SSC() {
+<span class="fc" id="L102">        return STUDENT_NAME_AS_PER_SSC;</span>
+    }
+
+    public void setSTUDENT_NAME_AS_PER_SSC(String STUDENT_NAME_AS_PER_SSC) {
+<span class="fc" id="L106">        this.STUDENT_NAME_AS_PER_SSC = STUDENT_NAME_AS_PER_SSC;</span>
+<span class="fc" id="L107">    }</span>
+
+    public String getFATHER_NAME_AS_PER_SSC() {
+<span class="fc" id="L110">        return FATHER_NAME_AS_PER_SSC;</span>
+    }
+
+    public void setFATHER_NAME_AS_PER_SSC(String FATHER_NAME_AS_PER_SSC) {
+<span class="fc" id="L114">        this.FATHER_NAME_AS_PER_SSC = FATHER_NAME_AS_PER_SSC;</span>
+<span class="fc" id="L115">    }</span>
+
+    public String getMOTHER_NAME_AS_PER_SSC() {
+<span class="fc" id="L118">        return MOTHER_NAME_AS_PER_SSC;</span>
+    }
+
+    public void setMOTHER_NAME_AS_PER_SSC(String MOTHER_NAME_AS_PER_SSC) {
+<span class="fc" id="L122">        this.MOTHER_NAME_AS_PER_SSC = MOTHER_NAME_AS_PER_SSC;</span>
+<span class="fc" id="L123">    }</span>
+
+    public String getOCCUPATION() {
+<span class="fc" id="L126">        return OCCUPATION;</span>
+    }
+
+    public void setOCCUPATION(String OCCUPATION) {
+<span class="fc" id="L130">        this.OCCUPATION = OCCUPATION;</span>
+<span class="fc" id="L131">    }</span>
+
+    public String getF_OR_M() {
+<span class="fc" id="L134">        return F_OR_M;</span>
+    }
+
+    public void setF_OR_M(String f_OR_M) {
+<span class="fc" id="L138">        F_OR_M = f_OR_M;</span>
+<span class="fc" id="L139">    }</span>
+
+    public String getRoll_Number() {
+<span class="fc" id="L142">        return Roll_Number;</span>
+    }
+
+    public void setRoll_Number(String roll_Number) {
+<span class="fc" id="L146">        Roll_Number = roll_Number;</span>
+<span class="fc" id="L147">    }</span>
+
+    public String getSection() {
+<span class="fc" id="L150">        return Section;</span>
+    }
+
+    public void setSection(String section) {
+<span class="fc" id="L154">        Section = section;</span>
+<span class="fc" id="L155">    }</span>
+
+    public String getProfile_picture() {
+<span class="fc" id="L158">        return profile_picture;</span>
+    }
+
+    public void setProfile_picture(String profile_picture) {
+<span class="fc" id="L162">        this.profile_picture = profile_picture;</span>
+<span class="fc" id="L163">    }</span>
+
+    public String getStudent_Class() {
+<span class="fc" id="L166">        return Student_Class;</span>
+    }
+
+    public void setStudent_Class(String student_Class) {
+<span class="fc" id="L170">        Student_Class = student_Class;</span>
+<span class="fc" id="L171">    }</span>
+
+    public String getCAST() {
+<span class="fc" id="L174">        return CAST;</span>
+    }
+
+    public void setCAST(String CAST) {
+<span class="fc" id="L178">        this.CAST = CAST;</span>
+<span class="fc" id="L179">    }</span>
+
+    public String getSUB_CAST() {
+<span class="fc" id="L182">        return SUB_CAST;</span>
+    }
+
+    public void setSUB_CAST(String SUB_CAST) {
+<span class="fc" id="L186">        this.SUB_CAST = SUB_CAST;</span>
+<span class="fc" id="L187">    }</span>
+
+    public String getMOBILE_NO_1() {
+<span class="fc" id="L190">        return MOBILE_NO_1;</span>
+    }
+
+    public void setMOBILE_NO_1(String MOBILE_NO_1) {
+<span class="fc" id="L194">        this.MOBILE_NO_1 = MOBILE_NO_1;</span>
+<span class="fc" id="L195">    }</span>
+
+    public String getMOBILE_NO_2() {
+<span class="fc" id="L198">        return MOBILE_NO_2;</span>
+    }
+
+    public void setMOBILE_NO_2(String MOBILE_NO_2) {
+<span class="fc" id="L202">        this.MOBILE_NO_2 = MOBILE_NO_2;</span>
+<span class="fc" id="L203">    }</span>
+
+    public String getDIST_NAME() {
+<span class="fc" id="L206">        return DIST_NAME;</span>
+    }
+
+    public void setDIST_NAME(String DIST_NAME) {
+<span class="fc" id="L210">        this.DIST_NAME = DIST_NAME;</span>
+<span class="fc" id="L211">    }</span>
+
+    public String getPIN_CODE() {
+<span class="fc" id="L214">        return PIN_CODE;</span>
+    }
+
+    public void setPIN_CODE(String PIN_CODE) {
+<span class="fc" id="L218">        this.PIN_CODE = PIN_CODE;</span>
+<span class="fc" id="L219">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

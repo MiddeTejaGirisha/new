@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DynamoDBCli.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A sample Hello World created for SAM CLI.</a> &gt; <a href="index.source.html" class="el_package">student_crud_operations.utilities</a> &gt; <span class="el_source">DynamoDBCli.java</span></div><h1>DynamoDBCli.java</h1><pre class="source lang-java linenums">package student_crud_operations.utilities;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
+
+import java.net.URI;
+
+<span class="nc" id="L12">public class DynamoDBCli {</span>
+
+    public static DynamoDbClient createDynamoDbClient() {
+        try {
+<span class="nc" id="L16">            return DynamoDbClient.builder()</span>
+<span class="nc" id="L17">                    .endpointOverride(URI.create(&quot;http://host.docker.internal:8000&quot;)) // DynamoDB Local endpoint</span>
+<span class="nc" id="L18">                    .credentialsProvider(StaticCredentialsProvider.create(</span>
+<span class="nc" id="L19">                            AwsBasicCredentials.create(&quot;ASIA46ZDFQOUKY5UL2UB&quot;, &quot;a89oRKr/hIhFZK9qHNVr4nIQH1z2CKIkuYfcCMV9&quot;))) // Dummy credentials</span>
+<span class="nc" id="L20">                    .region(Region.US_EAST_1)</span>
+<span class="nc" id="L21">                    .build();</span>
+<span class="nc" id="L22">        } catch (SdkClientException e) {</span>
+<span class="nc" id="L23">            System.err.println(&quot;Error creating DynamoDB client: &quot; + e.getMessage());</span>
+<span class="nc" id="L24">            return null; // Or handle as needed</span>
+        }
+
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

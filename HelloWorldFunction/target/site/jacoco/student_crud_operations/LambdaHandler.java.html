@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LambdaHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">A sample Hello World created for SAM CLI.</a> &gt; <a href="index.source.html" class="el_package">student_crud_operations</a> &gt; <span class="el_source">LambdaHandler.java</span></div><h1>LambdaHandler.java</h1><pre class="source lang-java linenums">package student_crud_operations;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.google.gson.Gson;
+
+import student_crud_operations.dao.StudentDao;
+import student_crud_operations.pojo.Student;
+import student_crud_operations.utilities.DynamoDBCli;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+
+/**
+ * Handler for requests to Lambda function.
+ */
+public class LambdaHandler implements RequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; {
+
+    private final DynamoDbClient dynamoDbClient;
+    private final StudentDao studentRepo;
+
+<span class="nc" id="L25">    public LambdaHandler() {</span>
+<span class="nc" id="L26">        this.dynamoDbClient = DynamoDBCli.createDynamoDbClient(); // DynamoDB client initialization</span>
+<span class="nc" id="L27">        this.studentRepo = new StudentDao(dynamoDbClient); // StudentRepo to handle CRUD</span>
+<span class="nc" id="L28">    }</span>
+
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(
+            APIGatewayProxyRequestEvent event, Context context) {
+<span class="nc" id="L33">        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+
+<span class="nc" id="L35">        String httpMethod = event.getHttpMethod();</span>
+
+        try {
+            // Determine the operation based on the HTTP method and URL path
+<span class="nc bnc" id="L39" title="All 5 branches missed.">            switch (httpMethod) {</span>
+                case &quot;POST&quot;:
+<span class="nc" id="L41">                    return createStudent(event);</span>
+                case &quot;GET&quot;:
+<span class="nc" id="L43">                    return getStudent(event);</span>
+                case &quot;PUT&quot;:
+<span class="nc" id="L45">                    return updateStudent(event);</span>
+                case &quot;DELETE&quot;:
+<span class="nc" id="L47">                    return deleteStudent(event);</span>
+                default:
+<span class="nc" id="L49">                    response.setStatusCode(405); // Method Not Allowed</span>
+<span class="nc" id="L50">                    response.setBody(&quot;Method not allowed&quot;);</span>
+<span class="nc" id="L51">                    return response;</span>
+            }
+<span class="nc" id="L53">        } catch (Exception e) {</span>
+<span class="nc" id="L54">            response.setStatusCode(500); // Internal Server Error</span>
+<span class="nc" id="L55">            response.setBody(&quot;Error: &quot; + e.getMessage());</span>
+<span class="nc" id="L56">            return response;</span>
+        }
+    }
+
+    // Handle POST to create a student
+    private APIGatewayProxyResponseEvent createStudent(APIGatewayProxyRequestEvent event) {
+        // Extract student information from the body of the event
+<span class="nc" id="L63">        String body = event.getBody();</span>
+<span class="nc" id="L64">        Student student = parseStudentFromBody(body); // A helper method to parse JSON into Student object</span>
+
+<span class="nc" id="L66">        PutItemResponse res= studentRepo.saveStudent(student); // Save student to DynamoDB</span>
+
+<span class="nc" id="L68">        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+<span class="nc" id="L69">        response.setStatusCode(res.sdkHttpResponse().statusCode()); // Created</span>
+<span class="nc" id="L70">        response.setBody(&quot;Student created successfully&quot;);</span>
+<span class="nc" id="L71">        return response;</span>
+    }
+
+    // Handle GET to retrieve a student by ID
+    private APIGatewayProxyResponseEvent getStudent(APIGatewayProxyRequestEvent event) {
+<span class="nc" id="L76">        String studentId = event.getPathParameters().get(&quot;id&quot;);</span>
+
+<span class="nc" id="L78">        Student student = studentRepo.getStudentByAdmissionID(studentId);</span>
+
+<span class="nc" id="L80">        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (student != null) {</span>
+<span class="nc" id="L82">            response.setStatusCode(200); // OK</span>
+<span class="nc" id="L83">            response.setBody(toJson(student)); // Convert the student object to JSON</span>
+        } else {
+<span class="nc" id="L85">            response.setStatusCode(404); // Not Found</span>
+<span class="nc" id="L86">            response.setBody(&quot;Student not found&quot;);</span>
+        }
+
+<span class="nc" id="L89">        return response;</span>
+    }
+
+    // Handle PUT to update a student
+    private APIGatewayProxyResponseEvent updateStudent(APIGatewayProxyRequestEvent event) {
+<span class="nc" id="L94">        String body = event.getBody();</span>
+<span class="nc" id="L95">        String studentId=event.getPathParameters().get(&quot;id&quot;);</span>
+<span class="nc" id="L96">        Student student = parseStudentFromBody(body);</span>
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (!studentId.equals(student.getAdmissionID())) {</span>
+            // Return error response if IDs do not match
+<span class="nc" id="L100">            APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+<span class="nc" id="L101">            response.setStatusCode(400); // Bad Request</span>
+<span class="nc" id="L102">            response.setBody(&quot;Error: URL id does not match the student id in the body&quot;);</span>
+<span class="nc" id="L103">            return response;</span>
+        }
+
+<span class="nc" id="L106">        UpdateItemResponse res=studentRepo.updateStudent(student);</span>
+
+<span class="nc" id="L108">        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+<span class="nc" id="L109">        response.setStatusCode(res.sdkHttpResponse().statusCode()); // OK</span>
+<span class="nc" id="L110">        response.setBody(&quot;Student updated successfully&quot;);</span>
+<span class="nc" id="L111">        return response;</span>
+    }
+
+    // Handle DELETE to delete a student by ID
+    private APIGatewayProxyResponseEvent deleteStudent(APIGatewayProxyRequestEvent event) {
+<span class="nc" id="L116">        String studentId = event.getPathParameters().get(&quot;id&quot;);</span>
+
+<span class="nc" id="L118">        DeleteItemResponse res= studentRepo.deleteStudentById(studentId);</span>
+
+
+<span class="nc" id="L121">        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();</span>
+        // If the response contains attributes, deletion was successful
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (res == null) {</span>
+            // Item not found or condition failed
+<span class="nc" id="L125">            response.setStatusCode(404);  // Not Found</span>
+<span class="nc" id="L126">            response.setBody(&quot;Student with AdmissionID &quot; + studentId + &quot; does not exist or could not be deleted.&quot;);</span>
+        } else {
+            // Deletion successful
+<span class="nc" id="L129">            response.setStatusCode(200);  // OK</span>
+<span class="nc" id="L130">            response.setBody(&quot;Student with AdmissionID &quot; + studentId + &quot; deleted successfully.&quot;);</span>
+        }
+
+<span class="nc" id="L133">        return response;</span>
+    }
+
+    // Helper method to parse JSON into Student object
+    private Student parseStudentFromBody(String body) {
+<span class="nc" id="L138">        Gson gson = new Gson();</span>
+        try {
+            // Parse JSON string to Student object
+<span class="nc" id="L141">            return gson.fromJson(body, Student.class);</span>
+<span class="nc" id="L142">        } catch (Exception e) {</span>
+<span class="nc" id="L143">            e.printStackTrace();</span>
+<span class="nc" id="L144">            return null;</span>
+        }
+    }
+
+    // Helper method to convert a Student object to JSON
+    private String toJson(Student student) {
+<span class="nc" id="L150">        Gson gson = new Gson();</span>
+        try {
+            // Convert Student object to JSON
+<span class="nc" id="L153">            return gson.toJson(student);</span>
+<span class="nc" id="L154">        } catch (Exception e) {</span>
+<span class="nc" id="L155">            e.printStackTrace();</span>
+<span class="nc" id="L156">            return &quot;{}&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

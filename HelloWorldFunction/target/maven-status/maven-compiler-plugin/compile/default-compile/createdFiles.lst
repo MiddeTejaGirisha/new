@@ -1,0 +1,4 @@
+student_crud_operations\LambdaHandler.class
+student_crud_operations\pojo\Student.class
+student_crud_operations\dao\StudentDao.class
+student_crud_operations\utilities\DynamoDBCli.class
